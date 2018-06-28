@@ -1,5 +1,6 @@
-#!/home/leo/Documents/Moringa-core/MS-Python-Pre-work/peeeches/virtual/bin/python3.6
-
+#!/bin/sh
+'''exec' "/home/leo/Documents/BIG LEO'S CORE/MS-Python-Pre-work/peeeches/virtual/bin/python" "$0" "$@"
+' '''
 # -*- coding: utf-8 -*-
 import re
 import sys
@@ -7,5 +8,5 @@ import sys
 from flask.cli import main
 
 if __name__ == '__main__':
-    sys.argv[0] = re.sub(r'(-script\.pyw|\.exe)?$', '', sys.argv[0])
+    sys.argv[0] = re.sub(r'(-script\.pyw?|\.exe)?$', '', sys.argv[0])
     sys.exit(main())

@@ -37,7 +37,7 @@ deactivate () {
 # unset irrelevant variables
 deactivate nondestructive
 
-VIRTUAL_ENV="/home/leo/Documents/Moringa-core/MS-Python-Pre-work/peeeches/virtual"
+VIRTUAL_ENV="/home/leo/Documents/BIG LEO'S CORE/MS-Python-Pre-work/peeeches/virtual"
 export VIRTUAL_ENV
 
 _OLD_VIRTUAL_PATH="$PATH"
