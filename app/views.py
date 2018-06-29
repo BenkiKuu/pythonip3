@@ -4,32 +4,16 @@ from PIL import Image
 from app import app, db, bcrypt
 from flask import render_template, url_for, flash, redirect, request
 from app.models import User, Post
-from app.forms import RegistrationForm, LoginForm, UpdateAccountForm
+from app.forms import RegistrationForm, LoginForm, UpdateAccountForm, PostForm
 from flask_login import login_user, current_user, logout_user, login_required
 
 
 
-
-
-posts = [
-    {
-        'author': 'Leo Igane',
-        'title': 'Minute Pitch 1',
-        'content': 'First pitch content',
-        'date_posted': 'April 20, 20018'
-    },
-    {
-    'author': 'Njeri Igane',
-    'title': 'Minute Pitch 2',
-    'content': 'Second pitch content',
-    'date_posted': 'April 21, 20018'
-    }
-    ]
-
 @app.route('/')
 @app.route('/home')
 def home():
-    return render_template('home.html', posts = posts)
+    posts = Post.query.all()
+    return render_template('home.html', posts=posts)
 
 @app.route('/about')
 def about():
@@ -105,3 +89,16 @@ def account():
         form.email.data = current_user.email
     image_file = url_for('static',filename='profile_pics/' + current_user.image_file)
     return render_template('account.html', title='account', image_file=image_file, form=form)
+
+
+@app.route('/post/new', methods=['GET','POST'])
+@login_required
+def new_post():
+    form = PostForm()
+    if form.validate_on_submit():
+        post = Post(title=form.title.data, content=form.content.data, author=current_user)
+        db.session.add(post)
+        db.session.commit()
+        flash('Your post has been created!', 'success')
+        return redirect(url_for('home'))
+    return render_template('create_post.html', title='New Post', form=form)
