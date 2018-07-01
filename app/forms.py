@@ -53,3 +53,13 @@ class PostForm(FlaskForm):
     title = StringField('Title', validators = [DataRequired()])
     content = TextAreaField('content', validators=[DataRequired()])
     submit = SubmitField('Post')
+
+class ProductForm(FlaskForm):
+    title = StringField('Title', validators = [DataRequired()])
+    content = TextAreaField('content', validators=[DataRequired()])
+    submit = SubmitField('Product')
+
+class PickupForm(FlaskForm):
+    title = StringField('Title', validators = [DataRequired()])
+    content = TextAreaField('content', validators=[DataRequired()])
+    submit = SubmitField('Pickup')
