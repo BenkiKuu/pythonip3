@@ -1,19 +1,26 @@
 {% extends 'base.html' %}
 {% block content %}
-  <h1>Home Page</h1>
-    {% for post in posts %}
+  <h1>HOME</h1>
+
       <article class="media content-section">
-        <img class="rounded-circle article-img" src="{{ url_for('static', filename='profile_pics/' + post.author.image_file) }}">
         <div class="media-body">
-          <div class="article-metadata">
-            <a class="mr-2" href="#">{{ post.author.username }}</a>
-            <small class="text-muted">{{ post.date_posted.strftime('%Y-%m-%d') }}</small>
-          </div>
-          <h2><a class="article-title" href="{{ url_for('post', post_id=post.id) }}">{{ post.title }}</a></h2>
-          <p class="article-content">{{ post.content }}</p>
+          <h2><a class="article-title" href="{{url_for('post_home')}}">General Post</a></h2>
+          <p class="article-content">Have a general post, lets read it</p>
           </div>
       </article>
-    {% endfor %}
+      <article class="media content-section">
+        <div class="media-body">
+          <h2><a class="article-title" href="{{url_for('product_home')}}">Product Pitch</a></h2>
+          <p class="article-content">Have a Product? Why dont you give it a pitch</p>
+          </div>
+      </article>
+      <article class="media content-section">
+        <div class="media-body">
+          <h2><a class="article-title" href="{{url_for('pickup_home')}}">Pick Up Line</a></h2>
+          <p class="article-content">Fancy Yourself a Romantic? let us see </p>
+          </div>
+      </article>
+
 {% endblock content %}
 
 

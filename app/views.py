@@ -173,7 +173,7 @@ def new_product():
         db.session.commit()
         flash('Your Product Pitch has been created!', 'success')
         return redirect(url_for('product_home'))
-    return render_template('create_product.html', title='New Product', form=form, legend='New Product')
+    return render_template('product.html', title='New Product', form=form, legend='New Product')
 
 
 
@@ -216,7 +216,7 @@ def delete_product(product_id):
     db.session.delete(product)
     db.session.commit()
     flash('Your Product Pitch has been deleted!', 'success')
-    return redirect(url_for('product_home'))
+    return redirect(url_for('templates/product_home'))
 
 @app.route('/pickup/new', methods=['GET','POST'])
 @login_required
