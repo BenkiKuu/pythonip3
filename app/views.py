@@ -3,8 +3,8 @@ import secrets
 from PIL import Image
 from app import app, db, bcrypt
 from flask import render_template, url_for, flash, redirect, request, abort
-from app.models import User, Post, Pickup, Product
-from app.forms import RegistrationForm, LoginForm, UpdateAccountForm, PostForm, PickupForm, ProductForm
+from app.models import User, Post, Pickup, Product, CommentsPost, CommentsPickup, CommentsProduct
+from app.forms import RegistrationForm, LoginForm, UpdateAccountForm, PostForm, PickupForm, ProductForm, PostCommentForm, ProductCommentForm, PickupCommentForm
 from flask_login import login_user, current_user, logout_user, login_required
 
 
@@ -118,10 +118,19 @@ def new_post():
 
 
 
-@app.route('/post/<int:post_id>/')
+@app.route('/post/<int:post_id>/',methods=["GET","POST"])
 def post(post_id):
     post = Post.query.get_or_404(post_id)
-    return render_template('post.html', title=post.title, post=post)
+    form = PostCommentForm()
+    if form.validate_on_submit():
+        comment = form.comment.data
+        new_post_comment = CommentsPost(comment=comment, post_id=post_id, user_id=current_user.id)
+        # new_post_comment.save_post_comments()
+        db.session.add(new_post_comment)
+        db.session.commit()
+    comments = CommentsPost.query.all()
+    return render_template('post.html', title=post.title, post=post, post_form=form, comments=comments)
+
 
 @app.route('/post/<int:post_id>/update', methods=['GET','POST'])
 @login_required
@@ -153,6 +162,7 @@ def delete_post(post_id):
     return redirect(url_for('post_home'))
 
 
+
 @app.route('/product/new', methods=['GET','POST'])
 @login_required
 def new_product():
@@ -167,10 +177,17 @@ def new_product():
 
 
 
-@app.route('/product/<int:product_id>/')
+@app.route('/product/<int:product_id>/', methods=['GET','POST'])
 def product(product_id):
     product = Product.query.get_or_404(product_id)
-    return render_template('product.html', title=product.title, product=product)
+    form = ProductCommentForm()
+    if form.validate_on_submit():
+        comment = form.comment.data
+        new_product_comment = CommentsProduct(comment=comment, product_id=product_id, user_id=current_user.id)
+        db.session.add(new_product_comment)
+        db.session.commit()
+    comments = CommentsProduct.query.all()
+    return render_template('product.html', title=product.title, product=product, product_form=form, comments=comments)
 
 @app.route('/product/<int:product_id>/update', methods=['GET','POST'])
 @login_required
@@ -215,10 +232,18 @@ def new_pickup():
 
 
 
-@app.route('/pickup/<int:pickup_id>/')
+@app.route('/pickup/<int:pickup_id>/', methods=['GET','POST'])
 def pickup(pickup_id):
     pickup = Pickup.query.get_or_404(pickup_id)
-    return render_template('pickup.html', title=pickup.title, pickup=pickup)
+    form = PickupCommentForm()
+    if form.validate_on_submit():
+        comment = form.comment.data
+        new_pickup_comment = CommentsPickup(comment=comment, pickup_id=pickup_id, user_id=current_user.id)
+        db.session.add(new_pickup_comment)
+        db.session.commit()
+    comments = CommentsPickup.query.all()
+    return render_template('pickup.html', title=pickup.title, pickup=pickup, pickup_form=form, comments=comments)
+
 
 @app.route('/pickup/<int:pickup_id>/update', methods=['GET','POST'])
 @login_required

@@ -52,14 +52,27 @@ class UpdateAccountForm(FlaskForm):
 class PostForm(FlaskForm):
     title = StringField('Title', validators = [DataRequired()])
     content = TextAreaField('content', validators=[DataRequired()])
+    submit = SubmitField('Post General Post')
+
+class PostCommentForm(FlaskForm):
+    comment = StringField('Comment: ', validators=[DataRequired()])
     submit = SubmitField('Post')
+
 
 class ProductForm(FlaskForm):
     title = StringField('Title', validators = [DataRequired()])
     content = TextAreaField('content', validators=[DataRequired()])
-    submit = SubmitField('Product')
+    submit = SubmitField('Post Product Pitch')
+
+class ProductCommentForm(FlaskForm):
+    comment = StringField('Comment: ', validators=[DataRequired()])
+    submit = SubmitField('Post')
 
 class PickupForm(FlaskForm):
     title = StringField('Title', validators = [DataRequired()])
     content = TextAreaField('content', validators=[DataRequired()])
-    submit = SubmitField('Pickup')
+    submit = SubmitField('Post Pick up Lines')
+
+class PickupCommentForm(FlaskForm):
+    comment = StringField('Comment: ', validators=[DataRequired()])
+    submit = SubmitField('Post')

@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% import 'bootstrap/wtf.html' as wtf %}
 {% block content %}
   <h1>Product Pitch</h1>
       <article class="media content-section">
@@ -18,6 +19,20 @@
           <p class="article-content">{{ product.content }}</p>
           </div>
       </article>
+      {{wtf.quick_form(product_form)}}
+
+      {% for comment in comments[::-1] %}
+      <article class="">
+        <div class="media-body">
+          <div class="article-metadata">
+            <a class="mr-2" href="#">{{ comment.author.username }}</a>
+            <small class="text-muted">{{ comment.title.date_posted.strftime('%Y-%m-%d') }}</small>
+          </div>
+          <p class="article-content">{{ comment.comment }}</p>
+          </div>
+
+      </article>
+      {% endfor %}
       <!-- Modal -->
 <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
