@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% block content %}
-  <h1>Home Page</h1>
+  <h1>PICK UP LINES</h1>
     {% for pickup in pickups %}
       <article class="media content-section">
         <img class="rounded-circle article-img" src="{{ url_for('static', filename='profile_pics/' + pickup.author.image_file) }}">

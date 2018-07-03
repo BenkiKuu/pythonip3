@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% block content %}
-  <h1>Product Pitch</h1>
+  <h1>PRODUCT PITCH</h1>
     {% for product in products %}
       <article class="media content-section">
         <img class="rounded-circle article-img" src="{{ url_for('static', filename='profile_pics/' + product.author.image_file) }}">
