@@ -23,7 +23,6 @@ Jinja2==2.10
 lxml==3.5.0
 Mako==1.0.7
 MarkupSafe==1.0
-onboard==1.2.0
 pexpect==4.0.1
 Pillow==3.1.2
 psycopg2==2.7.5
