@@ -5,7 +5,6 @@ blinker==1.4
 cffi==1.11.5
 chardet==2.3.0
 click==6.7
-command-not-found==0.3
 defer==1.0.6
 dominate==2.3.1
 Flask==1.0.2
