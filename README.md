@@ -1,4 +1,4 @@
-# Github Finder
+# PEEECHES
 
 This is the third Independent project for Moringa Core Python/Flask, June 22nd, 2018.
 The project was generated with Python3.6 using the Flask Framework
@@ -29,7 +29,7 @@ There are no known bugs. Contact me if you find.
 
 
 ## Live Website
-View the complete site [here](https://BenkiKuu.github.io/Angularip2/Github/)
+View the complete site [here]https://peeeches.herokuapp.com/
 
 ## Technologies Used
 It is built using Python and Fask, HTML, Bootstrap.
