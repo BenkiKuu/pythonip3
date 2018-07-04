@@ -1,42 +1,46 @@
 import os
+from . import main
+from .. import db, bcrypt
 import secrets
 from PIL import Image
+from flask_wtf import FlaskForm
+# from PIL.Image import core as _imaging
 from app import app, db, bcrypt
 from flask import render_template, url_for, flash, redirect, request, abort
-from app.models import User, Post, Pickup, Product, CommentsPost, CommentsPickup, CommentsProduct
-from app.forms import RegistrationForm, LoginForm, UpdateAccountForm, PostForm, PickupForm, ProductForm, PostCommentForm, ProductCommentForm, PickupCommentForm
+from ..models import User, Post, Pickup, Product, CommentsPost, CommentsPickup, CommentsProduct
+from .forms import RegistrationForm, LoginForm, UpdateAccountForm, PostForm, PickupForm, ProductForm, PostCommentForm, ProductCommentForm, PickupCommentForm
 from flask_login import login_user, current_user, logout_user, login_required
 
 
 
-@app.route('/')
-@app.route('/home')
+@main.route('/')
+@main.route('/home')
 def home():
     return render_template('index.html', title='Home')
 
-@app.route('/about')
+@main.route('/about')
 def about():
     return render_template('about.html', title='About')
 
-@app.route('/post_home')
+@main.route('/post_home')
 def post_home():
     posts = Post.query.all()
     return render_template('post_home.html', posts=posts)
 
-@app.route('/product_home')
+@main.route('/product_home')
 def product_home():
     products = Product.query.all()
     return render_template('product_home.html', products=products)
 
-@app.route('/pickup_home')
+@main.route('/pickup_home')
 def pickup_home():
     pickups = Pickup.query.all()
     return render_template('pickup_home.html', pickups=pickups)
 
-@app.route('/register', methods=['GET','POST'])
+@main.route('/register', methods=['GET','POST'])
 def register():
     if current_user.is_authenticated:
-        return redirect(url_for('home'))
+        return redirect(url_for('main.home'))
     form = RegistrationForm()
     if form.validate_on_submit():
         hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
@@ -44,11 +48,11 @@ def register():
         db.session.add(user)
         db.session.commit()
         flash('Your account has been created! You are now able to login','success')
-        return redirect(url_for('login'))
+        return redirect(url_for('main.login'))
     return render_template('register.html', title='Register', form=form)
 
 
-@app.route('/login', methods=['GET','POST'])
+@main.route('/login', methods=['GET','POST'])
 def login():
     if current_user.is_authenticated:
         return redirect(url_for('home'))
@@ -58,16 +62,16 @@ def login():
         if user and bcrypt.check_password_hash(user.password, form.password.data):
             login_user(user, remember=form.remember.data)
             next_page = request.args.get('next')
-            return redirect(next_page) if next_page else redirect(url_for('home'))
+            return redirect(next_page) if next_page else redirect(url_for('main.home'))
         else:
             flash('Login Unsuccessful. please check email and password', 'danger')
     return render_template('login.html', title='Login', form=form)
 
 
-@app.route('/logout')
+@main.route('/logout')
 def logout():
     logout_user()
-    return redirect(url_for('home'))
+    return redirect(url_for('main.home'))
 
 
 def save_picture(form_picture):
@@ -84,7 +88,7 @@ def save_picture(form_picture):
     return picture_fn
 
 
-@app.route('/account', methods=['GET','POST'])
+@main.route('/account', methods=['GET','POST'])
 @login_required
 def account():
     form = UpdateAccountForm()
@@ -96,7 +100,7 @@ def account():
         current_user.email = form.email.data
         db.session.commit()
         flash('Your account has been updated!', 'success')
-        return redirect(url_for('account'))
+        return redirect(url_for('main.account'))
     elif request.method == 'GET':
         form.username.data = current_user.username
         form.email.data = current_user.email
@@ -104,7 +108,7 @@ def account():
     return render_template('account.html', title='account', image_file=image_file, form=form)
 
 
-@app.route('/post/new', methods=['GET','POST'])
+@main.route('/post/new', methods=['GET','POST'])
 @login_required
 def new_post():
     form = PostForm()
@@ -113,12 +117,12 @@ def new_post():
         db.session.add(post)
         db.session.commit()
         flash('Your post has been created!', 'success')
-        return redirect(url_for('post_home'))
+        return redirect(url_for('main.post_home'))
     return render_template('create_post.html', title='New Post', form=form, legend='New Post')
 
 
 
-@app.route('/post/<int:post_id>/',methods=["GET","POST"])
+@main.route('/post/<int:post_id>/',methods=["GET","POST"])
 def post(post_id):
     post = Post.query.get_or_404(post_id)
     form = PostCommentForm()
@@ -132,7 +136,7 @@ def post(post_id):
     return render_template('post.html', title=post.title, post=post, post_form=form, comments=comments)
 
 
-@app.route('/post/<int:post_id>/update', methods=['GET','POST'])
+@main.route('/post/<int:post_id>/update', methods=['GET','POST'])
 @login_required
 def update_post(post_id):
     post = Post.query.get_or_404(post_id)
@@ -144,26 +148,29 @@ def update_post(post_id):
         post.content = form.content.data
         db.session.commit()
         flash('Your post has been updated!', 'success')
-        return redirect(url_for('post', post_id=post.id))
+        return redirect(url_for('main.post', post_id=post.id))
     elif request.method == 'GET':
         form.title.data = post.title
         form.content.data = post.content
     return render_template('create_post.html', title='Update Post', form=form, legend='Update Post')
 
-@app.route('/post/<int:post_id>/delete', methods=['POST'])
+@main.route('/post/<int:post_id>/delete', methods=['GET', 'POST'])
 @login_required
 def delete_post(post_id):
     post = Post.query.get_or_404(post_id)
+    for comment in post.comments.all():
+        db.session.delete(comment)
+        db.session.commit()
     if post.author != current_user:
         abort(403)
     db.session.delete(post)
     db.session.commit()
     flash('Your post has been deleted!', 'success')
-    return redirect(url_for('post_home'))
+    return redirect(url_for('main.post_home'))
 
 
 
-@app.route('/product/new', methods=['GET','POST'])
+@main.route('/product/new', methods=['GET','POST'])
 @login_required
 def new_product():
     form = ProductForm()
@@ -172,12 +179,12 @@ def new_product():
         db.session.add(product)
         db.session.commit()
         flash('Your Product Pitch has been created!', 'success')
-        return redirect(url_for('product_home'))
-    return render_template('product.html', title='New Product', form=form, legend='New Product')
+        return redirect(url_for('main.product_home'))
+    return render_template('create_product.html', title='New Product', form=form, legend='New Product')
 
 
 
-@app.route('/product/<int:product_id>/', methods=['GET','POST'])
+@main.route('/product/<int:product_id>/', methods=['GET','POST'])
 def product(product_id):
     product = Product.query.get_or_404(product_id)
     form = ProductCommentForm()
@@ -189,7 +196,7 @@ def product(product_id):
     comments = CommentsProduct.query.all()
     return render_template('product.html', title=product.title, product=product, product_form=form, comments=comments)
 
-@app.route('/product/<int:product_id>/update', methods=['GET','POST'])
+@main.route('/product/<int:product_id>/update', methods=['GET','POST'])
 @login_required
 def update_product(product_id):
     product = Product.query.get_or_404(product_id)
@@ -201,24 +208,27 @@ def update_product(product_id):
         product.content = form.content.data
         db.session.commit()
         flash('Your Product Pitch has been updated!', 'success')
-        return redirect(url_for('product', product_id=product.id))
+        return redirect(url_for('main.product', product_id=product.id))
     elif request.method == 'GET':
         form.title.data = product.title
         form.content.data = product.content
     return render_template('create_product.html', title='Update Product Pitch', form=form, legend='Update Product Pitch')
 
-@app.route('/product/<int:product_id>/delete', methods=['POST'])
+@main.route('/product/<int:product_id>/delete', methods=['GET','POST'])
 @login_required
 def delete_product(product_id):
     product = Product.query.get_or_404(product_id)
+    for comment in product.comments.all():
+        db.session.delete(comment)
+        db.session.commit()
     if product.author != current_user:
         abort(403)
     db.session.delete(product)
     db.session.commit()
     flash('Your Product Pitch has been deleted!', 'success')
-    return redirect(url_for('templates/product_home'))
+    return redirect(url_for('main.product_home'))
 
-@app.route('/pickup/new', methods=['GET','POST'])
+@main.route('/pickup/new', methods=['GET','POST'])
 @login_required
 def new_pickup():
     form = PickupForm()
@@ -227,12 +237,12 @@ def new_pickup():
         db.session.add(pickup)
         db.session.commit()
         flash('Your Pick Up Line has been created!', 'success')
-        return redirect(url_for('pickup_home'))
+        return redirect(url_for('main.pickup_home'))
     return render_template('create_pickup.html', title='New Pick Up Line', form=form, legend='New Pick Up Line')
 
 
 
-@app.route('/pickup/<int:pickup_id>/', methods=['GET','POST'])
+@main.route('/pickup/<int:pickup_id>/', methods=['GET','POST'])
 def pickup(pickup_id):
     pickup = Pickup.query.get_or_404(pickup_id)
     form = PickupCommentForm()
@@ -245,7 +255,7 @@ def pickup(pickup_id):
     return render_template('pickup.html', title=pickup.title, pickup=pickup, pickup_form=form, comments=comments)
 
 
-@app.route('/pickup/<int:pickup_id>/update', methods=['GET','POST'])
+@main.route('/pickup/<int:pickup_id>/update', methods=['GET','POST'])
 @login_required
 def update_pickup(pickup_id):
     pickup = Pickup.query.get_or_404(pickup_id)
@@ -257,19 +267,22 @@ def update_pickup(pickup_id):
         pickup.content = form.content.data
         db.session.commit()
         flash('Your Pick Up Line has been updated!', 'success')
-        return redirect(url_for('pickup', pickup_id=pickup.id))
+        return redirect(url_for('main.pickup', pickup_id=pickup.id))
     elif request.method == 'GET':
         form.title.data = pickup.title
         form.content.data = pickup.content
     return render_template('create_pickup.html', title='Update Pick Up Line', form=form, legend='Update Pick Up Line')
 
-@app.route('/pickup/<int:pickup_id>/delete', methods=['POST'])
+@main.route('/pickup/<int:pickup_id>/delete', methods=['GET','POST'])
 @login_required
 def delete_pickup(pickup_id):
     pickup = Pickup.query.get_or_404(pickup_id)
+    for comment in pickup.comments.all():
+        db.session.delete(comment)
+        db.session.commit()
     if pickup.author != current_user:
         abort(403)
     db.session.delete(pickup)
     db.session.commit()
     flash('Your Pick Up Line has been deleted!', 'success')
-    return redirect(url_for('pickup_home'))
+    return redirect(url_for('main.pickup_home'))

@@ -9,7 +9,7 @@
             <a class="mr-2" href="#">{{ pickup.author.username }}</a>
             <small class="text-muted">{{ pickup.date_posted.strftime('%Y-%m-%d') }}</small>
           </div>
-          <h2><a class="article-title" href="{{ url_for('pickup', pickup_id=pickup.id) }}">{{ pickup.title }}</a></h2>
+          <h2><a class="article-title" href="{{ url_for('main.pickup', pickup_id=pickup.id) }}">{{ pickup.title }}</a></h2>
           <p class="article-content">{{ pickup.content }}</p>
           </div>
       </article>
