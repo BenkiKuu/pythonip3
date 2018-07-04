@@ -20,7 +20,6 @@ gunicorn==19.9.0
 html5lib==0.999
 itsdangerous==0.24
 Jinja2==2.10
-language-selector==0.1
 louis==2.6.4
 lxml==3.5.0
 Mako==1.0.7
