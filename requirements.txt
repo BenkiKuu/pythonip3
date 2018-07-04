@@ -31,7 +31,6 @@ ptyprocess==0.5
 pycparser==2.18
 pycups==1.9.73
 pycurl==7.43.0
-pygobject==3.20.0
 python-apt===1.1.0.b1-elementary2-r2-ubuntu0.4.1.1
 python-dateutil==2.7.3
 python-editor==1.0.3
